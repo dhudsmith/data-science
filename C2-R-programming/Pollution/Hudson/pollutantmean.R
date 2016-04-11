@@ -1,7 +1,7 @@
 library(readr)
 
 #Part 1
-pollutantmean <- function(directory, pollutant, id = 1:322){
+pollutantmean <- function(directory, pollutant, id = 1:332){
   # Get the files
   files.ls <- list.files(directory)[id]
   
@@ -24,7 +24,7 @@ pollutantmean <- function(directory, pollutant, id = 1:322){
 }
 
 # Part 2
-complete <- function(directory, id = 1:322){
+complete <- function(directory, id = 1:332){
   # Get the files
   files.ls <- list.files(directory)[id]
   
@@ -35,7 +35,7 @@ complete <- function(directory, id = 1:322){
                             df <- read_csv(full_path)
                             
                             # Return the total and the number of complete observations
-                            unname( sum(!is.na(df$sulfate) & !is.na(df$nitrate)))
+                            unname( sum( complete.cases(df) ) )
                           },
                           FUN.VALUE = numeric(1)
                      )
@@ -50,20 +50,20 @@ corr <- function(directory, threshold = 0){
   files.ls <- list.files(directory)
   
   # Get the file ids that meet the threshold
-  files.ls <- files.ls[ subset( complete(directory), nobs >= threshold )$id ]
+  files.ls <- files.ls[ subset( complete(directory), nobs > threshold )$id ]
   
-  # Get the sum of pollutant and number of observations for each id
+  # Calculate the correlation
   cor.vec <- vapply(files.ls, 
                      function(x){
                        full_path <- file.path(directory, x)
                        df <- read_csv(full_path)
                        
                        # Return the correlations
-                       cor(df$sulfate, df$nitrate, use = "pairwise.complete.obs")
+                       cor(as.numeric(df$sulfate), as.numeric(df$nitrate), use = "complete.obs")
                      },
                      FUN.VALUE = numeric(1)
   )
   
-  # Convert to data.frame
+  # Output
   unname( cor.vec )
 }
