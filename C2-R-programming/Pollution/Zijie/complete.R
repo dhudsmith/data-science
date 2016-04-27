@@ -1,3 +1,5 @@
+source("misc.R")
+
 complete <- function(directory, id = 1:332) {
     ## 'directory' is a character vector of length 1 indicating
     ## the location of the CSV files
@@ -13,21 +15,12 @@ complete <- function(directory, id = 1:332) {
     ## where 'id' is the monitor ID number and 'nobs' is the
     ## number of complete cases
 
-    df <- data.frame(id = integer(), nobs = integer())
-
+    nobs <- list()
     for (file_num in id){
+        data <- readdata(directory,file_num)
 
-        file_name <- paste(directory, "/", sprintf("%03d", file_num),
-                           ".csv", sep = "")
-
-        data <- read.csv(file_name)
-
-        df <- rbind(df, data.frame(id = file_num, 
-                                   nobs = nrow(data[complete.cases(data), ])
-                                  ) 
-                   )
-
+        nobs <- c(nobs,nrow(data[complete.cases(data),]))
     }
 
-    df
+    data.frame(id=id,nobs=unlist(nobs))
 }

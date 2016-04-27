@@ -1,3 +1,5 @@
+source("misc.R")
+
 corr <- function(directory, threshold = 0) {
     ## 'directory' is a character vector of length 1 indicating
     ## the location of the CSV files
@@ -10,22 +12,16 @@ corr <- function(directory, threshold = 0) {
     ## Return a numeric vector of correlations
 
     id_nobs <- complete(directory)
-    id <- id_nobs[id_nobs[, "nobs"] > threshold, "id"]
+    id <- id_nobs[id_nobs[,"nobs"]>threshold,"id"]
 
     correlation <- vector()
 
     for (file_num in id) {
+        data <- readdata(directory,file_num)
 
-        file_path <- paste(directory, "/", sprintf("%03d", file_num),
-                           ".csv", sep = "")
-        
-        data <- read.csv(file_path)
-
-        correlation <- c(correlation, 
-                         cor(data[complete.cases(data), "nitrate"],
-                             data[complete.cases(data), "sulfate"]
-                            )
-                        )
+        correlation <- c(correlation,
+                         cor(data[complete.cases(data),"nitrate"],
+                             data[complete.cases(data),"sulfate"]))
     }
 
     correlation

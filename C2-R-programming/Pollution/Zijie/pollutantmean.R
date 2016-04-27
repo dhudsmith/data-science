@@ -1,3 +1,5 @@
+source("misc.R")
+
 pollutantmean <- function(directory, pollutant, id = 1:332) {
     ## 'directory' is a character vector of length 1 indicating
     ## the location of the CSV files
@@ -16,15 +18,12 @@ pollutantmean <- function(directory, pollutant, id = 1:332) {
     num <- 0
 
     for (file_num in id){
-        file_name <- paste(directory, "/", sprintf("%03d", file_num),
-                           ".csv", sep = "")
+        data <- readdata(directory,file_num)
 
-        data <- read.csv(file_name)
+        relevant_data <- data[!is.na(data[pollutant]),pollutant]
 
-        relevant_data <- data[!is.na(data[pollutant]), pollutant]
-
-        tot <- tot + sum(relevant_data)
-        num <- num + length(relevant_data)
+        tot <- tot+sum(relevant_data)
+        num <- num+length(relevant_data)
     }
 
     tot/num
